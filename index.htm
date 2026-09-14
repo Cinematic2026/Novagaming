@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>NOVA Live Global Chat</title>
   
   <!-- Iconify SVG Icons & Google Fonts -->
@@ -20,72 +20,98 @@
       --accent-glow: rgba(59, 130, 246, 0.35);
       --text: #f8fafc;
       --text-dim: #94a3b8;
-      --border: rgba(255, 255, 255, 0.07);
+      --border: rgba(255, 255, 255, 0.08);
       --bubble-own: linear-gradient(135deg, var(--accent), #1d4ed8);
       --bubble-other: #161f30;
+      --sat: env(safe-area-inset-top);
+      --sab: env(safe-area-inset-bottom);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: 'Plus Jakarta Sans', sans-serif; 
+      -webkit-tap-highlight-color: transparent; 
+    }
 
-    body {
+    html, body {
+      height: 100%;
+      width: 100%;
       background-color: var(--bg);
       color: var(--text);
+      overflow: hidden;
+      position: fixed; /* Evita rebotes de scroll en móviles */
+    }
+
+    body {
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      overflow: hidden;
     }
 
+    /* Layout Responsivo Universal */
     .chat-app {
       width: 100%;
-      max-width: 600px;
-      height: 100vh;
+      height: 100%;
+      max-width: 650px;
       background: var(--panel);
       display: flex;
       flex-direction: column;
-      box-shadow: 0 0 80px rgba(0, 0, 0, 0.9);
       position: relative;
       overflow: hidden;
     }
 
-    @media (min-height: 700px) and (min-width: 620px) {
+    @media (min-width: 650px) and (min-height: 650px) {
       .chat-app {
         height: 92vh;
         border-radius: 24px;
         border: 1px solid var(--border);
+        box-shadow: 0 0 80px rgba(0, 0, 0, 0.8);
       }
     }
 
-    /* Header */
+    /* Header Adaptable */
     .chat-header {
-      padding: 14px 18px;
-      background: rgba(13, 19, 31, 0.85);
+      padding: calc(10px + var(--sat)) 14px 10px 14px;
+      background: rgba(13, 19, 31, 0.92);
       backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
       align-items: center;
       z-index: 20;
+      gap: 8px;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .brand h3 {
+      font-size: 0.88rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .live-indicator {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       background: rgba(34, 197, 94, 0.1);
       border: 1px solid rgba(34, 197, 94, 0.2);
-      padding: 4px 10px;
+      padding: 3px 8px;
       border-radius: 20px;
-      font-size: 0.72rem;
+      font-size: 0.65rem;
       color: #4ade80;
       font-weight: 600;
+      flex-shrink: 0;
     }
 
     .live-dot {
@@ -105,20 +131,28 @@
     .header-right-actions {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
+      flex-shrink: 0;
     }
 
     .user-badge {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: var(--accent);
       background: rgba(59, 130, 246, 0.1);
       border: 1px solid rgba(59, 130, 246, 0.25);
-      padding: 6px 12px;
-      border-radius: 14px;
+      padding: 5px 10px;
+      border-radius: 12px;
       font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
+      max-width: 110px;
+    }
+
+    .user-badge span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .icon-btn-settings {
@@ -127,41 +161,43 @@
       color: var(--text-dim);
       width: 34px;
       height: 34px;
-      border-radius: 12px;
+      border-radius: 10px;
       display: flex;
       justify-content: center;
       align-items: center;
       cursor: pointer;
-      transition: color 0.2s, background 0.2s, transform 0.1s;
+      transition: color 0.2s, background 0.2s;
+      flex-shrink: 0;
     }
-    .icon-btn-settings:hover { color: var(--text); background: rgba(255, 255, 255, 0.1); }
     .icon-btn-settings:active { transform: scale(0.95); }
 
-    /* Viewport Mensajes */
+    /* Viewport de Mensajes */
     .messages-viewport {
       flex: 1;
-      padding: 20px;
+      padding: 14px 12px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 14px;
+      will-change: transform;
+      contain: content;
     }
 
-    .messages-viewport::-webkit-scrollbar { width: 5px; }
-    .messages-viewport::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+    .messages-viewport::-webkit-scrollbar { width: 4px; }
+    .messages-viewport::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 10px; }
 
     .message-group {
       display: flex;
       flex-direction: column;
-      max-width: 80%;
+      max-width: 86%;
       position: relative;
       touch-action: pan-y;
       transition: transform 0.15s ease-out;
-      animation: slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: slideUp 0.18s ease-out;
     }
 
     @keyframes slideUp {
-      from { opacity: 0; transform: translateY(12px); }
+      from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
@@ -169,37 +205,61 @@
     .message-group.other { align-self: flex-start; align-items: flex-start; }
 
     .msg-author {
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       color: var(--text-dim);
-      margin-bottom: 4px;
+      margin-bottom: 3px;
       font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
+      padding: 0 2px;
     }
 
-    .msg-bubble-wrapper { position: relative; width: 100%; cursor: pointer; }
+    .msg-bubble-wrapper { 
+      position: relative; 
+      width: 100%; 
+      cursor: pointer; 
+    }
 
     .msg-bubble {
-      padding: 12px 16px;
-      border-radius: 18px;
-      font-size: 0.93rem;
-      line-height: 1.5;
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 0.88rem;
+      line-height: 1.45;
       word-break: break-word;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     }
 
     .message-group.own .msg-bubble {
       background: var(--bubble-own);
       color: #ffffff;
-      border-bottom-right-radius: 4px;
+      border-bottom-right-radius: 3px;
     }
 
     .message-group.other .msg-bubble {
       background: var(--bubble-other);
       color: var(--text);
-      border-bottom-left-radius: 4px;
+      border-bottom-left-radius: 3px;
       border: 1px solid var(--border);
+    }
+
+    /* Estilos para Imagen enviada en el chat */
+    .msg-img-thumb {
+      max-width: 250px;
+      max-height: 180px;
+      width: auto;
+      height: auto;
+      object-fit: cover;
+      border-radius: 10px;
+      display: block;
+      margin-top: 4px;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+    .msg-img-thumb:hover {
+      opacity: 0.92;
+      transform: scale(1.01);
     }
 
     /* Cita de Respuesta */
@@ -207,21 +267,21 @@
       background: rgba(0, 0, 0, 0.25);
       border-left: 3px solid var(--accent);
       border-radius: 6px;
-      padding: 6px 10px;
-      margin-bottom: 8px;
-      font-size: 0.78rem;
+      padding: 5px 8px;
+      margin-bottom: 6px;
+      font-size: 0.74rem;
     }
     .reply-quote-author { font-weight: 700; color: var(--accent); margin-bottom: 2px; }
     .reply-quote-text { color: rgba(255, 255, 255, 0.85); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* Meta Datos del Mensaje */
+    /* Metadata */
     .msg-meta {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 0.65rem;
-      color: rgba(255, 255, 255, 0.6);
-      margin-top: 4px;
+      gap: 6px;
+      font-size: 0.63rem;
+      color: rgba(255, 255, 255, 0.55);
+      margin-top: 3px;
       padding: 0 2px;
     }
 
@@ -242,68 +302,66 @@
       cursor: pointer;
       display: flex;
       align-items: center;
-      margin-left: 4px;
-      opacity: 0.75;
-      transition: opacity 0.2s;
+      margin-left: 2px;
+      opacity: 0.8;
+      padding: 2px;
     }
-    .delete-btn:hover { opacity: 1; }
 
-    /* Reacciones */
+    /* Selector de Reacciones */
     .reaction-trigger-zone {
       position: absolute;
-      top: -34px;
+      top: -32px;
       display: none;
       background: #151d2a;
       border: 1px solid var(--border);
-      border-radius: 30px;
-      padding: 4px 10px;
-      gap: 8px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+      border-radius: 20px;
+      padding: 3px 8px;
+      gap: 6px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
       z-index: 10;
     }
 
     .message-group.own .reaction-trigger-zone { right: 0; }
     .message-group.other .reaction-trigger-zone { left: 0; }
-    .msg-bubble-wrapper:hover .reaction-trigger-zone { display: flex; }
+    .msg-bubble-wrapper:hover .reaction-trigger-zone,
+    .msg-bubble-wrapper:active .reaction-trigger-zone { display: flex; }
 
-    .react-opt { cursor: pointer; font-size: 1.15rem; transition: transform 0.15s ease; }
-    .react-opt:hover { transform: scale(1.35); }
+    .react-opt { cursor: pointer; font-size: 1.05rem; transition: transform 0.1s ease; }
+    .react-opt:active { transform: scale(1.3); }
 
-    .active-reactions { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+    .active-reactions { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
 
     .reaction-pill {
       background: rgba(21, 28, 45, 0.9);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 3px 8px;
-      font-size: 0.73rem;
+      border-radius: 10px;
+      padding: 2px 6px;
+      font-size: 0.68rem;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       cursor: pointer;
       user-select: none;
-      transition: background 0.2s;
     }
-    .reaction-pill:hover { background: rgba(59, 130, 246, 0.2); }
 
-    /* Banner de Respuesta */
+    /* Preview de Respuesta */
     .reply-preview-bar {
       background: rgba(21, 29, 45, 0.95);
       border-top: 1px solid var(--border);
-      padding: 8px 16px;
+      padding: 6px 14px;
       display: none;
       align-items: center;
       justify-content: space-between;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
     }
     .reply-preview-bar.active { display: flex; }
-    .reply-preview-info { border-left: 3px solid var(--accent); padding-left: 8px; }
+    .reply-preview-info { border-left: 3px solid var(--accent); padding-left: 8px; min-width: 0; }
     .reply-preview-title { font-weight: 700; color: var(--accent); }
-    .reply-preview-text { color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 280px; }
+    .reply-preview-text { color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* Footer / Input Bar Pro */
+    /* Footer Adaptable */
     .chat-footer {
-      padding: 12px 16px;
+      padding: 8px 10px calc(8px + var(--sab)) 10px;
       background: rgba(13, 19, 31, 0.95);
       border-top: 1px solid var(--border);
       position: relative;
@@ -314,14 +372,14 @@
       align-items: center;
       background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 28px;
-      padding: 6px 8px 6px 18px;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      border-radius: 24px;
+      padding: 4px 6px 4px 14px;
+      gap: 6px;
     }
 
     .input-wrapper:focus-within {
       border-color: var(--accent);
-      box-shadow: 0 0 20px var(--accent-glow);
+      box-shadow: 0 0 12px var(--accent-glow);
     }
 
     .input-wrapper input {
@@ -329,54 +387,56 @@
       background: transparent;
       border: none;
       color: var(--text);
-      font-size: 0.92rem;
+      font-size: 0.88rem;
       outline: none;
+      min-width: 0;
     }
 
     .char-counter {
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       color: var(--text-dim);
-      margin-right: 6px;
+      flex-shrink: 0;
     }
 
-    .input-actions { display: flex; align-items: center; gap: 6px; }
+    .input-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
 
     .action-btn {
       background: transparent;
       border: none;
       color: var(--text-dim);
-      width: 38px;
-      height: 38px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
       cursor: pointer;
-      transition: color 0.2s, background 0.2s;
+      flex-shrink: 0;
     }
 
-    .action-btn:hover { color: var(--text); background: rgba(255, 255, 255, 0.05); }
+    .send-btn { 
+      background: var(--accent); 
+      color: white; 
+    }
 
-    .send-btn { background: var(--accent); color: white; }
-    .send-btn:hover { background: var(--accent); color: white; box-shadow: 0 0 15px var(--accent-glow); }
-
-    /* Floating Panels */
+    /* Paneles Flotantes Adaptables */
     .emoji-picker-panel, .settings-panel {
       position: absolute;
-      bottom: 75px;
+      bottom: calc(60px + var(--sab));
+      right: 10px;
+      left: 10px;
+      max-width: 340px;
+      margin: 0 auto;
       background: #111723;
       border: 1px solid var(--border);
-      border-radius: 20px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.85);
       display: none;
       flex-direction: column;
       z-index: 50;
       overflow: hidden;
       animation: fadeIn 0.15s ease-out;
     }
-
-    .emoji-picker-panel { right: 16px; width: 310px; height: 250px; }
-    .settings-panel { right: 16px; width: 310px; padding: 16px; gap: 14px; }
 
     .emoji-picker-panel.active, .settings-panel.active { display: flex; }
 
@@ -388,39 +448,110 @@
       font-weight: 600;
     }
 
-    .settings-title { padding: 0 0 10px 0; font-size: 0.9rem; color: var(--text); }
+    .settings-panel { padding: 14px; gap: 12px; }
 
     .emoji-grid {
-      flex: 1;
       display: grid;
       grid-template-columns: repeat(6, 1fr);
-      gap: 8px;
-      padding: 12px;
+      gap: 6px;
+      padding: 10px;
+      max-height: 200px;
       overflow-y: auto;
     }
 
     .emoji-grid-item {
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       text-align: center;
       cursor: pointer;
-      padding: 4px;
+      padding: 6px 0;
       border-radius: 8px;
-      transition: background 0.15s, transform 0.1s;
     }
 
-    .emoji-grid-item:hover { background: rgba(255, 255, 255, 0.08); transform: scale(1.2); }
+    .emoji-grid-item:active { background: rgba(255, 255, 255, 0.1); transform: scale(1.15); }
 
-    .field-group { display: flex; flex-direction: column; gap: 6px; }
-    .field-group label { font-size: 0.72rem; color: var(--text-dim); }
+    .field-group { display: flex; flex-direction: column; gap: 4px; }
+    .field-group label { font-size: 0.7rem; color: var(--text-dim); }
     .field-group input, .field-group select {
       background: var(--bg);
       border: 1px solid var(--border);
-      padding: 8px 12px;
-      border-radius: 10px;
+      padding: 8px 10px;
+      border-radius: 8px;
       color: var(--text);
       outline: none;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
     }
+
+    /* Modal Visor Pantalla Completa */
+    .image-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.92);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 99999;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .image-modal.active { display: flex; }
+
+    .image-modal-content {
+      max-width: 92vw;
+      max-height: 80vh;
+      border-radius: 12px;
+      object-fit: contain;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    }
+
+    .image-modal-actions {
+      margin-top: 18px;
+    }
+
+    .modal-btn-download {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 10px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .modal-btn-download:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: scale(1.02);
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 28px;
+      color: #fff;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background 0.2s;
+    }
+    .modal-close-btn:hover { background: rgba(255, 255, 255, 0.25); }
   </style>
 </head>
 <body>
@@ -428,32 +559,29 @@
 <div class="chat-app">
   <div class="chat-header">
     <div class="brand">
-      <iconify-icon icon="solar:chat-round-line-bold-duotone" style="font-size: 1.6rem; color: var(--accent);"></iconify-icon>
-      <div>
-        <h3 style="font-size: 0.95rem; font-weight: 700;">CHAT GLOBAL</h3>
-      </div>
+      <iconify-icon icon="solar:chat-round-line-bold-duotone" style="font-size: 1.4rem; color: var(--accent); flex-shrink:0;"></iconify-icon>
+      <h3>CHAT GLOBAL</h3>
       <div class="live-indicator">
         <div class="live-dot"></div> LIVE
       </div>
     </div>
     <div class="header-right-actions">
       <div class="user-badge" id="userBadge">
-        <iconify-icon icon="solar:user-circle-bold"></iconify-icon>
+        <iconify-icon icon="solar:user-circle-bold" style="flex-shrink:0;"></iconify-icon>
         <span id="badgeName">Anónimo</span>
       </div>
-      <!-- Botón Ajustes Superior Derecho -->
-      <button class="icon-btn-settings" id="settingsToggleBtn" title="Ajustes de usuario">
-        <iconify-icon icon="solar:settings-bold-duotone" style="font-size: 1.25rem;"></iconify-icon>
+      <button class="icon-btn-settings" id="settingsToggleBtn" title="Ajustes">
+        <iconify-icon icon="solar:settings-bold-duotone" style="font-size: 1.15rem;"></iconify-icon>
       </button>
     </div>
   </div>
 
-  <!-- Panel Ajustes Flotante Derecho -->
+  <!-- Panel Ajustes -->
   <div class="settings-panel" id="settingsPanel">
-    <div class="settings-title">Personalización del Chat</div>
+    <div class="settings-title" style="padding:0; border:none; color:var(--text); font-size:0.85rem;">Personalización</div>
     <div class="field-group">
       <label>Tu Nombre de Usuario:</label>
-      <input type="text" id="usernameInput" placeholder="Escribe tu nombre..." maxlength="20">
+      <input type="text" id="usernameInput" placeholder="Escribe tu nombre..." maxlength="18">
     </div>
     <div class="field-group">
       <label>Color de Acento:</label>
@@ -465,7 +593,7 @@
         <option value="#f59e0b">Ámbar Fuego</option>
       </select>
     </div>
-    <button class="action-btn send-btn" id="saveSettingsBtn" style="width: 100%; border-radius: 10px; height: 36px; font-size: 0.8rem; font-weight: 600;">Guardar Cambios</button>
+    <button class="action-btn send-btn" id="saveSettingsBtn" style="width: 100%; border-radius: 8px; height: 34px; font-size: 0.78rem; font-weight: 600;">Guardar Cambios</button>
   </div>
 
   <!-- Viewport Mensajes -->
@@ -474,31 +602,48 @@
   <!-- Banner Respuesta Activa -->
   <div class="reply-preview-bar" id="replyBar">
     <div class="reply-preview-info">
-      <div class="reply-preview-title" id="replyAuthor">Respondiendo a User</div>
-      <div class="reply-preview-text" id="replyText">Mensaje...</div>
+      <div class="reply-preview-title" id="replyAuthor">Respondiendo</div>
+      <div class="reply-preview-text" id="replyText">...</div>
     </div>
-    <button class="icon-btn-settings" id="cancelReplyBtn" style="width:28px; height:28px; border:none;"><iconify-icon icon="solar:close-circle-bold"></iconify-icon></button>
+    <button class="icon-btn-settings" id="cancelReplyBtn" style="width:26px; height:26px; border:none;"><iconify-icon icon="solar:close-circle-bold"></iconify-icon></button>
   </div>
 
-  <!-- Emoji Selector Flotante -->
+  <!-- Emoji Picker -->
   <div class="emoji-picker-panel" id="emojiPicker">
     <div class="emoji-picker-header">EMOJIS RÁPIDOS</div>
     <div class="emoji-grid" id="emojiGrid"></div>
   </div>
 
+  <!-- Footer Input -->
   <div class="chat-footer">
     <form class="input-wrapper" id="chatForm">
-      <input type="text" id="msgInput" placeholder="Escribe un mensaje..." maxlength="300" autocomplete="off" required>
+      <input type="file" id="imageInput" accept="image/*" style="display: none;">
+      <button type="button" class="action-btn" id="imageBtn" title="Adjuntar Imagen">
+        <iconify-icon icon="solar:gallery-wide-bold-duotone" style="font-size: 1.25rem;"></iconify-icon>
+      </button>
+      <input type="text" id="msgInput" placeholder="Escribe un mensaje..." maxlength="300" autocomplete="off">
       <span class="char-counter" id="charCounter">300</span>
       <div class="input-actions">
         <button type="button" class="action-btn" id="emojiToggleBtn" title="Emojis">
-          <iconify-icon icon="solar:smile-circle-bold-duotone" style="font-size: 1.35rem;"></iconify-icon>
+          <iconify-icon icon="solar:smile-circle-bold-duotone" style="font-size: 1.25rem;"></iconify-icon>
         </button>
         <button type="submit" class="action-btn send-btn" title="Enviar">
-          <iconify-icon icon="solar:plain-3-bold-duotone" style="font-size: 1.25rem;"></iconify-icon>
+          <iconify-icon icon="solar:plain-3-bold-duotone" style="font-size: 1.15rem;"></iconify-icon>
         </button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- Modal Pantalla Completa (Visor) -->
+<div id="imageModal" class="image-modal">
+  <button class="modal-close-btn" id="closeModalBtn">&times;</button>
+  <img id="modalImage" class="image-modal-content" src="" alt="Vista Previa">
+  <div class="image-modal-actions">
+    <a id="downloadBtn" class="modal-btn-download" download="imagen_nova.png">
+      <iconify-icon icon="solar:download-square-bold-duotone" style="font-size: 1.2rem;"></iconify-icon>
+      Descargar Imagen
+    </a>
   </div>
 </div>
 
@@ -512,7 +657,8 @@
     onChildAdded, 
     onChildChanged, 
     onChildRemoved,
-    runTransaction 
+    runTransaction,
+    get
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
   const firebaseConfig = {
@@ -527,10 +673,13 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
-  const EXPIRATION_MS = 72 * 60 * 60 * 1000;
+  
+  // 3 Horas Exactas de Expiración (10,800,000 ms)
+  const EXPIRATION_MS = 3 * 60 * 60 * 1000;
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
-  // Estado del Usuario y Configuración
   let activeReply = null;
+  
   function setupIdentity() {
     let saved = localStorage.getItem('nova_user');
     if (!saved) {
@@ -553,25 +702,45 @@
   }
   applyUserConfig();
 
-  // Sonido de envío sin librerías usando Web Audio API
+  // Sonido de Envío Optimizado
   function playPopSound() {
     try {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(600, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.08);
-      gain.gain.setValueAtTime(0.15, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+      osc.frequency.setValueAtTime(580, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(220, ctx.currentTime + 0.07);
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.07);
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start();
-      osc.stop(ctx.currentTime + 0.08);
+      osc.stop(ctx.currentTime + 0.07);
     } catch (e) {}
   }
 
-  // Panel Ajustes
+  // Auto-Limpieza en Servidor (Borra de Firebase lo mayor a 3 Horas)
+  async function cleanExpiredServerData() {
+    try {
+      const snapshot = await get(messagesRef);
+      if (snapshot.exists()) {
+        const now = Date.now();
+        const data = snapshot.val();
+        Object.keys(data).forEach(key => {
+          if (now - data[key].timestamp >= EXPIRATION_MS) {
+            remove(ref(db, `global_chat/${key}`));
+          }
+        });
+      }
+    } catch (err) {
+      console.warn("Limpieza omitida:", err);
+    }
+  }
+  cleanExpiredServerData();
+  setInterval(cleanExpiredServerData, 60000); // Revisión automática cada minuto
+
+  // Ajustes
   const settingsPanel = document.getElementById('settingsPanel');
   document.getElementById('settingsToggleBtn').onclick = (e) => {
     e.stopPropagation();
@@ -588,13 +757,15 @@
     settingsPanel.classList.remove('active');
   };
 
-  // Galería de Emojis
+  // Emojis
   const emojiList = ['🔥','😂','❤️','🍿','👏','😎','🙌','🚀','💀','🎉','⚡','😍','🤔','💯','🥳','👍','👎','💩','👀','✨','💪','🎯','🤩','👑'];
   const emojiGrid = document.getElementById('emojiGrid');
   const emojiPicker = document.getElementById('emojiPicker');
   const emojiToggleBtn = document.getElementById('emojiToggleBtn');
   const msgInput = document.getElementById('msgInput');
   const charCounter = document.getElementById('charCounter');
+  const imageBtn = document.getElementById('imageBtn');
+  const imageInput = document.getElementById('imageInput');
 
   emojiList.forEach(emoji => {
     const item = document.createElement('div');
@@ -619,29 +790,49 @@
     settingsPanel.classList.remove('active');
   };
 
+  imageBtn.onclick = () => imageInput.click();
+
+  // Envío de Imágenes con Validación de 5 MB
+  imageInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > MAX_FILE_SIZE) {
+      alert('La imagen no puede superar el tamaño máximo de 5 MB.');
+      this.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      const base64Data = evt.target.result;
+      sendPayload({ image: base64Data });
+    };
+    reader.readAsDataURL(file);
+    this.value = '';
+  });
+
   document.onclick = (e) => {
     if (!emojiPicker.contains(e.target) && e.target !== emojiToggleBtn) emojiPicker.classList.remove('active');
     if (!settingsPanel.contains(e.target) && e.target !== document.getElementById('settingsToggleBtn')) settingsPanel.classList.remove('active');
   };
 
-  // Cancelar Respuesta
   document.getElementById('cancelReplyBtn').onclick = () => {
     activeReply = null;
     document.getElementById('replyBar').classList.remove('active');
   };
 
-  // Enviar mensaje
-  document.getElementById('chatForm').addEventListener('submit', (e) => {
-    e.preventDefault();
+  function sendPayload(extraData = {}) {
     const val = msgInput.value.trim();
-    if (!val) return;
+    if (!val && !extraData.image) return;
 
     const payload = {
       uid: user.uid,
       author: user.name,
       text: val,
       timestamp: Date.now(),
-      reactions: {}
+      reactions: {},
+      ...extraData
     };
 
     if (activeReply) payload.replyTo = activeReply;
@@ -654,9 +845,14 @@
     activeReply = null;
     document.getElementById('replyBar').classList.remove('active');
     emojiPicker.classList.remove('active');
+  }
+
+  // Enviar Mensaje de Texto
+  document.getElementById('chatForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    sendPayload();
   });
 
-  // Calculador de Expiración
   function getRemainingTimeString(timestamp) {
     const remaining = EXPIRATION_MS - (Date.now() - timestamp);
     if (remaining <= 0) return 'Expirado';
@@ -671,16 +867,23 @@
   }
 
   function setReplyTarget(data) {
-    activeReply = { author: data.author, text: data.text };
+    const textPreview = data.image ? '📷 Imagen' : data.text;
+    activeReply = { author: data.author, text: textPreview };
     document.getElementById('replyAuthor').textContent = `Respondiendo a ${data.author}`;
-    document.getElementById('replyText').textContent = data.text;
+    document.getElementById('replyText').textContent = textPreview;
     document.getElementById('replyBar').classList.add('active');
     msgInput.focus();
   }
 
-  // Renderizar Mensaje
+  // Renderizado Inteligente
   function createOrUpdateMessage(data, key) {
-    if (Date.now() - data.timestamp >= EXPIRATION_MS) return;
+    // Si ya expiró (más de 3 horas), lo elimina de Firebase e interfaz
+    if (Date.now() - data.timestamp >= EXPIRATION_MS) {
+      remove(ref(db, `global_chat/${key}`));
+      const expiredEl = document.getElementById(`m-${key}`);
+      if (expiredEl) expiredEl.remove();
+      return;
+    }
 
     let el = document.getElementById(`m-${key}`);
     const isOwn = data.uid === user.uid;
@@ -691,17 +894,24 @@
       el.className = `message-group ${isOwn ? 'own' : 'other'}`;
       viewport.appendChild(el);
 
-      // Deslizar para responder (Swipe derecha)
+      // Gestos de Deslizar para Responder
       let touchStartX = 0;
       el.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, {passive: true});
       el.addEventListener('touchmove', e => {
         let diff = e.touches[0].clientX - touchStartX;
-        if (diff > 0 && diff < 70) el.style.transform = `translateX(${diff}px)`;
+        if (diff > 0 && diff < 60) el.style.transform = `translateX(${diff}px)`;
       }, {passive: true});
       el.addEventListener('touchend', e => {
-        if (parseInt(el.style.transform.replace('translateX(', '') || 0) > 35) setReplyTarget(data);
+        if (parseInt(el.style.transform.replace('translateX(', '') || 0) > 30) setReplyTarget(data);
         el.style.transform = 'translateX(0px)';
       });
+
+      // Programar la remoción local automática al cumplirse las 3 horas
+      const remaining = EXPIRATION_MS - (Date.now() - data.timestamp);
+      setTimeout(() => {
+        el.remove();
+        remove(ref(db, `global_chat/${key}`));
+      }, remaining);
     }
 
     let reactionsHTML = '';
@@ -723,9 +933,14 @@
       `;
     }
 
+    let imageHTML = '';
+    if (data.image) {
+      imageHTML = `<img src="${data.image}" class="msg-img-thumb" alt="Imagen enviada" onclick="window.openImageModal('${data.image}')">`;
+    }
+
     const deleteHTML = isOwn ? `
-      <button class="delete-btn" onclick="window.deleteMsg('${key}')" title="Eliminar mensaje">
-        <iconify-icon icon="solar:trash-bin-trash-bold" style="font-size: 0.75rem;"></iconify-icon>
+      <button class="delete-btn" onclick="window.deleteMsg('${key}')" title="Eliminar del servidor">
+        <iconify-icon icon="solar:trash-bin-trash-bold" style="font-size: 0.72rem;"></iconify-icon>
       </button>
     ` : '';
 
@@ -744,7 +959,8 @@
         </div>
         <div class="msg-bubble">
           ${replyHTML}
-          ${sanitize(data.text)}
+          ${data.text ? sanitize(data.text) : ''}
+          ${imageHTML}
         </div>
       </div>
       <div class="active-reactions">${reactionsHTML}</div>
@@ -752,7 +968,7 @@
         <span>${timeStr}</span>
         <span>•</span>
         <span class="expiry-tag">
-          <iconify-icon icon="solar:clock-circle-bold" style="font-size: 0.75rem;"></iconify-icon>
+          <iconify-icon icon="solar:clock-circle-bold" style="font-size: 0.7rem;"></iconify-icon>
           ${expireStr}
         </span>
         ${deleteHTML}
@@ -763,7 +979,7 @@
     viewport.scrollTop = viewport.scrollHeight;
   }
 
-  // Listeners Firebase
+  // Eventos Firebase
   onChildAdded(messagesRef, snap => createOrUpdateMessage(snap.val(), snap.key));
   onChildChanged(messagesRef, snap => createOrUpdateMessage(snap.val(), snap.key));
   onChildRemoved(messagesRef, snap => {
@@ -776,9 +992,9 @@
     runTransaction(reactRef, curr => (curr === emoji ? null : emoji));
   };
 
+  // Eliminación Real del Servidor Firebase
   window.deleteMsg = (key) => {
-    const msgRef = ref(db, `global_chat/${key}`);
-    remove(msgRef);
+    remove(ref(db, `global_chat/${key}`));
   };
 
   window.triggerReply = (key) => {
@@ -786,7 +1002,30 @@
     if (el && el.dataset.payload) setReplyTarget(JSON.parse(el.dataset.payload));
   };
 
+  // Visor Pantalla Completa
+  const imageModal = document.getElementById('imageModal');
+  const modalImage = document.getElementById('modalImage');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+
+  window.openImageModal = (src) => {
+    modalImage.src = src;
+    downloadBtn.href = src;
+    downloadBtn.setAttribute('download', `nova_img_${Date.now()}.png`);
+    imageModal.classList.add('active');
+  };
+
+  function closeImageModal() {
+    imageModal.classList.remove('active');
+  }
+
+  closeModalBtn.onclick = closeImageModal;
+  imageModal.onclick = (e) => {
+    if (e.target === imageModal) closeImageModal();
+  };
+
   function sanitize(str) {
+    if (!str) return '';
     return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
   }
 </script>
