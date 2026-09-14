@@ -1,702 +1,794 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NexusPS2 Pro Ultimate</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
-    
-    <style>
-        :root {
-            --bg-main: #06070d;
-            --bg-glow: radial-gradient(circle at 50% -20%, #151a30 0%, #06070d 80%);
-            --glass-card: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.06);
-            --accent-blue: #0062ff;
-            --accent-glow: rgba(0, 98, 255, 0.4);
-            --text-white: #ffffff;
-            --text-grey: #8a99ad;
-            --heart-color: #ff2a5f;
-            --success-green: #00ff88;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>NOVA Live Global Chat</title>
+  
+  <!-- Iconify SVG Icons & Google Fonts -->
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
+  <style>
+    :root {
+      --bg: #070a0f;
+      --panel: #0d131f;
+      --panel-accent: #151c2d;
+      --accent: #3b82f6;
+      --accent-glow: rgba(59, 130, 246, 0.35);
+      --text: #f8fafc;
+      --text-dim: #94a3b8;
+      --border: rgba(255, 255, 255, 0.07);
+      --bubble-own: linear-gradient(135deg, var(--accent), #1d4ed8);
+      --bubble-other: #161f30;
+    }
 
-        body {
-            background: var(--bg-main);
-            background: var(--bg-glow);
-            color: var(--text-white);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            min-height: 100vh;
-            overflow-x: hidden;
-            padding-bottom: 110px; /* Ajustado para la nueva barra flotante */
-        }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
 
-        /* Vistas Globales */
-        .view-section {
-            display: none;
-            padding: 16px;
-            animation: viewEnter 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
 
-        .view-section.active { display: block; }
+    .chat-app {
+      width: 100%;
+      max-width: 600px;
+      height: 100vh;
+      background: var(--panel);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 80px rgba(0, 0, 0, 0.9);
+      position: relative;
+      overflow: hidden;
+    }
 
-        @keyframes viewEnter {
-            from { opacity: 0; transform: translateY(8px) scale(0.99); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
+    @media (min-height: 700px) and (min-width: 620px) {
+      .chat-app {
+        height: 92vh;
+        border-radius: 24px;
+        border: 1px solid var(--border);
+      }
+    }
 
-        /* Header */
-        header {
-            padding: 24px 16px 8px 16px;
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    /* Header */
+    .chat-header {
+      padding: 14px 18px;
+      background: rgba(13, 19, 31, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 20;
+    }
 
-        .brand {
-            font-weight: 800;
-            font-size: 1.4rem;
-            letter-spacing: -0.5px;
-            background: linear-gradient(135deg, #fff 40%, var(--text-grey));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .brand iconify-icon { color: var(--accent-blue); }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-        .section-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      color: #4ade80;
+      font-weight: 600;
+    }
 
-        /* Slider de Categorías */
-        .category-slider {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding: 4px 16px 20px 16px;
-            margin: 0 -16px;
-        }
-        .category-slider::-webkit-scrollbar { display: none; }
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      background-color: #22c55e;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #22c55e;
+      animation: pulse 2s infinite;
+    }
 
-        .chip {
-            background: var(--glass-card);
-            border: 1px solid var(--glass-border);
-            padding: 9px 18px;
-            border-radius: 24px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-grey);
-            white-space: nowrap;
-            cursor: pointer;
-            transition: all 0.25s;
-        }
-        .chip.active {
-            background: var(--accent-blue);
-            color: #fff;
-            border-color: var(--accent-blue);
-            box-shadow: 0 4px 14px var(--accent-glow);
-        }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(0.8); }
+    }
 
-        /* Grid de Tarjetas */
-        .game-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 16px;
-        }
+    .header-right-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-        .game-card {
-            background: var(--glass-card);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            overflow: hidden;
-            position: relative;
-            transition: transform 0.2s, border-color 0.2s;
-            cursor: pointer;
-        }
-        .game-card:active { transform: scale(0.96); }
+    .user-badge {
+      font-size: 0.75rem;
+      color: var(--accent);
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      padding: 6px 12px;
+      border-radius: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-        .image-container {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 3/4;
-            background: #11121a;
-        }
+    .icon-btn-settings {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: color 0.2s, background 0.2s, transform 0.1s;
+    }
+    .icon-btn-settings:hover { color: var(--text); background: rgba(255, 255, 255, 0.1); }
+    .icon-btn-settings:active { transform: scale(0.95); }
 
-        .game-cover { width: 100%; height: 100%; object-fit: cover; }
-        .card-overlay {
-            position: absolute;
-            bottom: 0; width: 100%; height: 60%;
-            background: linear-gradient(to top, rgba(6,7,13,0.95) 0%, transparent 100%);
-        }
+    /* Viewport Mensajes */
+    .messages-viewport {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
 
-        .tag-system {
-            position: absolute;
-            top: 12px; left: 12px;
-            display: flex; gap: 6px;
-        }
-        .tag {
-            background: rgba(6, 7, 13, 0.8);
-            backdrop-filter: blur(8px);
-            padding: 4px 8px;
-            border-radius: 8px;
-            font-size: 0.65rem;
-            font-weight: 700;
-            border: 1px solid rgba(255,255,255,0.08);
-        }
-        .tag.region { color: #00ffcc; }
-        .tag.fav { color: var(--heart-color); display: none; padding: 4px 6px; }
+    .messages-viewport::-webkit-scrollbar { width: 5px; }
+    .messages-viewport::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
 
-        .card-details { padding: 12px 14px 14px 14px; }
-        .game-title {
-            font-size: 0.9rem;
-            font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-bottom: 4px;
-        }
-        .game-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: var(--text-grey);
-        }
-        .game-size { color: var(--accent-blue); font-weight: 700; }
+    .message-group {
+      display: flex;
+      flex-direction: column;
+      max-width: 80%;
+      position: relative;
+      touch-action: pan-y;
+      transition: transform 0.15s ease-out;
+      animation: slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
 
-        /* Buscador */
-        .search-wrapper { position: relative; margin-bottom: 20px; }
-        .search-input {
-            width: 100%;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid var(--glass-border);
-            padding: 16px 16px 16px 48px;
-            border-radius: 18px;
-            color: #fff;
-            font-family: inherit;
-            outline: none;
-            font-size: 0.95rem;
-        }
-        .search-input:focus { border-color: var(--accent-blue); box-shadow: 0 0 20px var(--accent-glow); }
-        .search-wrapper iconify-icon {
-            position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
-            font-size: 1.3rem; color: var(--text-grey);
-        }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-        /* Panel de Detalles */
-        .details-panel {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #040508;
-            z-index: 200;
-            transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
-            display: flex;
-            flex-direction: column;
-        }
-        .details-panel.active { transform: translateY(0); }
+    .message-group.own { align-self: flex-end; align-items: flex-end; }
+    .message-group.other { align-self: flex-start; align-items: flex-start; }
 
-        .panel-header { padding: 16px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--glass-border); }
-        .btn-back {
-            background: var(--glass-card); border: 1px solid var(--glass-border);
-            color: #fff; padding: 10px 16px; border-radius: 12px;
-            cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 600;
-        }
-        .btn-heart {
-            background: var(--glass-card); border: 1px solid var(--glass-border);
-            color: var(--text-grey); width: 44px; height: 44px; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; font-size: 1.3rem; transition: all 0.2s;
-        }
-        .btn-heart.liked { color: var(--heart-color); background: rgba(255, 42, 95, 0.1); border-color: rgba(255, 42, 95, 0.2); }
+    .msg-author {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-        .panel-scroll { flex-grow: 1; overflow-y: auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 20px; }
-        .hero-banner { display: flex; gap: 16px; }
-        .big-cover { width: 110px; aspect-ratio: 3/4; object-fit: cover; border-radius: 16px; border: 1px solid var(--glass-border); }
-        .hero-info-text { display: flex; flex-direction: column; justify-content: center; gap: 8px; }
-        
-        .glass-block { background: var(--glass-card); border: 1px solid var(--glass-border); padding: 18px; border-radius: 20px; }
-        .block-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-        .block-text { font-size: 0.85rem; color: var(--text-grey); line-height: 1.5; }
+    .msg-bubble-wrapper { position: relative; width: 100%; cursor: pointer; }
 
-        /* Ficha Técnica de Emulador Profesional */
-        .specs-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
-        .specs-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.85rem; }
-        .specs-row:last-child { border: none; }
-        .spec-label { color: var(--text-grey); font-weight: 500; }
-        .spec-value { color: #fff; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+    .msg-bubble {
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 0.93rem;
+      line-height: 1.5;
+      word-break: break-word;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
 
-        /* Botón Universal */
-        .btn-universal {
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            width: 100%; background: var(--accent-blue); color: #fff; text-decoration: none;
-            padding: 16px; border-radius: 16px; font-weight: 700; font-size: 0.95rem;
-            box-shadow: 0 4px 18px var(--accent-glow); cursor: pointer; border: none; font-family: inherit;
-        }
+    .message-group.own .msg-bubble {
+      background: var(--bubble-own);
+      color: #ffffff;
+      border-bottom-right-radius: 4px;
+    }
 
-        /* Barra Flotante Inferior */
-        .bottom-nav-container {
-            position: fixed;
-            bottom: 20px; left: 50%;
-            transform: translateX(-50%);
-            width: calc(100vw - 32px);
-            max-width: 450px;
-            background: rgba(10, 12, 22, 0.7);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 28px;
-            padding: 6px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
-            z-index: 150;
-        }
+    .message-group.other .msg-bubble {
+      background: var(--bubble-other);
+      color: var(--text);
+      border-bottom-left-radius: 4px;
+      border: 1px solid var(--border);
+    }
 
-        .nav-items-wrapper {
-            position: relative;
-            display: flex;
-            justify-content: space-between;
-        }
+    /* Cita de Respuesta */
+    .reply-quote {
+      background: rgba(0, 0, 0, 0.25);
+      border-left: 3px solid var(--accent);
+      border-radius: 6px;
+      padding: 6px 10px;
+      margin-bottom: 8px;
+      font-size: 0.78rem;
+    }
+    .reply-quote-author { font-weight: 700; color: var(--accent); margin-bottom: 2px; }
+    .reply-quote-text { color: rgba(255, 255, 255, 0.85); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .nav-item {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            background: none; border: none;
-            color: var(--text-grey);
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 10px 0;
-            width: 32%;
-            z-index: 2;
-            transition: color 0.3s ease;
-        }
+    /* Meta Datos del Mensaje */
+    .msg-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.65rem;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: 4px;
+      padding: 0 2px;
+    }
 
-        .nav-item iconify-icon, .nav-item svg {
-            font-size: 1.35rem;
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
+    .message-group.other .msg-meta { color: var(--text-dim); }
 
-        .nav-item.active { color: #fff; }
-        .nav-item.active iconify-icon { transform: translateY(-4px) scale(1.1); color: var(--accent-blue); }
+    .expiry-tag {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      color: #f59e0b;
+      font-weight: 600;
+    }
 
-        /* Línea Indicadora o "Pill" Inteligente */
-        .nav-indicator {
-            position: absolute;
-            top: 0; left: 0;
-            height: 100%; width: 32%;
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 22px;
-            border: 1px solid rgba(255,255,255,0.05);
-            z-index: 1;
-            transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
-        }
+    .delete-btn {
+      background: transparent;
+      border: none;
+      color: #ef4444;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      margin-left: 4px;
+      opacity: 0.75;
+      transition: opacity 0.2s;
+    }
+    .delete-btn:hover { opacity: 1; }
 
-        /* 👑 REINGENIERÍA ESTRATÉGICA: CUSTOM TAB WINDOW EVOLUTION */
-        .custom-tab-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            z-index: 300;
-            opacity: 0; pointer-events: none;
-            transition: opacity 0.3s ease;
-            display: flex; flex-direction: column; justify-content: flex-end;
-        }
-        .custom-tab-overlay.open { opacity: 1; pointer-events: auto; }
+    /* Reacciones */
+    .reaction-trigger-zone {
+      position: absolute;
+      top: -34px;
+      display: none;
+      background: #151d2a;
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      padding: 4px 10px;
+      gap: 8px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+      z-index: 10;
+    }
 
-        .custom-tab-window {
-            width: 100%; height: 85vh;
-            background: #090a0f;
-            border-top-left-radius: 32px; border-top-right-radius: 32px;
-            border-top: 1px solid rgba(255,255,255,0.12);
-            box-shadow: 0 -15px 40px rgba(0,0,0,0.6);
-            transform: translateY(100%);
-            transition: transform 0.45s cubic-bezier(0.1, 0.9, 0.2, 1);
-            display: flex; flex-direction: column; overflow: hidden;
-        }
-        .custom-tab-overlay.open .custom-tab-window { transform: translateY(0); }
+    .message-group.own .reaction-trigger-zone { right: 0; }
+    .message-group.other .reaction-trigger-zone { left: 0; }
+    .msg-bubble-wrapper:hover .reaction-trigger-zone { display: flex; }
 
-        .custom-tab-navbar {
-            padding: 16px 20px;
-            background: #11131c;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            display: flex; align-items: center; justify-content: space-between;
-        }
-        .tab-browser-info { display: flex; flex-direction: column; gap: 2px; max-width: 65%; }
-        .tab-title { font-size: 0.9rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .tab-url { font-size: 0.72rem; color: var(--text-grey); display: flex; align-items: center; gap: 4px; }
-        
-        .btn-tab-close {
-            background: rgba(255,255,255,0.05); border: none; color: #fff;
-            padding: 8px 16px; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 0.85rem; transition: background 0.2s;
-        }
-        .btn-tab-close:active { background: rgba(255,255,255,0.1); }
+    .react-opt { cursor: pointer; font-size: 1.15rem; transition: transform 0.15s ease; }
+    .react-opt:hover { transform: scale(1.35); }
 
-        /* Contenedor UI Premium en lugar del Iframe bloqueado */
-        .tab-handover-body {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 32px 24px;
-            text-align: center;
-            gap: 24px;
-            background: radial-gradient(circle at 50% 40%, #101426 0%, #090a0f 70%);
-        }
-        .handover-icon-box {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .handover-pulse {
-            position: absolute;
-            width: 100px; height: 100px;
-            border-radius: 50%;
-            background: var(--accent-blue);
-            opacity: 0.15;
-            animation: pulseGlow 2s infinite ease-in-out;
-        }
-        @keyframes pulseGlow {
-            0% { transform: scale(0.8); opacity: 0.2; }
-            50% { transform: scale(1.3); opacity: 0.05; }
-            100% { transform: scale(0.8); opacity: 0.2; }
-        }
-        .tab-handover-body h3 { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.3px; }
-        .tab-handover-body p { font-size: 0.9rem; color: var(--text-grey); max-width: 340px; line-height: 1.5; }
-    </style>
+    .active-reactions { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+
+    .reaction-pill {
+      background: rgba(21, 28, 45, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 3px 8px;
+      font-size: 0.73rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.2s;
+    }
+    .reaction-pill:hover { background: rgba(59, 130, 246, 0.2); }
+
+    /* Banner de Respuesta */
+    .reply-preview-bar {
+      background: rgba(21, 29, 45, 0.95);
+      border-top: 1px solid var(--border);
+      padding: 8px 16px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+    }
+    .reply-preview-bar.active { display: flex; }
+    .reply-preview-info { border-left: 3px solid var(--accent); padding-left: 8px; }
+    .reply-preview-title { font-weight: 700; color: var(--accent); }
+    .reply-preview-text { color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 280px; }
+
+    /* Footer / Input Bar Pro */
+    .chat-footer {
+      padding: 12px 16px;
+      background: rgba(13, 19, 31, 0.95);
+      border-top: 1px solid var(--border);
+      position: relative;
+    }
+
+    .input-wrapper {
+      display: flex;
+      align-items: center;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 6px 8px 6px 18px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-wrapper:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    .input-wrapper input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 0.92rem;
+      outline: none;
+    }
+
+    .char-counter {
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      margin-right: 6px;
+    }
+
+    .input-actions { display: flex; align-items: center; gap: 6px; }
+
+    .action-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .action-btn:hover { color: var(--text); background: rgba(255, 255, 255, 0.05); }
+
+    .send-btn { background: var(--accent); color: white; }
+    .send-btn:hover { background: var(--accent); color: white; box-shadow: 0 0 15px var(--accent-glow); }
+
+    /* Floating Panels */
+    .emoji-picker-panel, .settings-panel {
+      position: absolute;
+      bottom: 75px;
+      background: #111723;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+      display: none;
+      flex-direction: column;
+      z-index: 50;
+      overflow: hidden;
+      animation: fadeIn 0.15s ease-out;
+    }
+
+    .emoji-picker-panel { right: 16px; width: 310px; height: 250px; }
+    .settings-panel { right: 16px; width: 310px; padding: 16px; gap: 14px; }
+
+    .emoji-picker-panel.active, .settings-panel.active { display: flex; }
+
+    .emoji-picker-header, .settings-title {
+      padding: 10px 14px;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+    }
+
+    .settings-title { padding: 0 0 10px 0; font-size: 0.9rem; color: var(--text); }
+
+    .emoji-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      padding: 12px;
+      overflow-y: auto;
+    }
+
+    .emoji-grid-item {
+      font-size: 1.3rem;
+      text-align: center;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 8px;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .emoji-grid-item:hover { background: rgba(255, 255, 255, 0.08); transform: scale(1.2); }
+
+    .field-group { display: flex; flex-direction: column; gap: 6px; }
+    .field-group label { font-size: 0.72rem; color: var(--text-dim); }
+    .field-group input, .field-group select {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--text);
+      outline: none;
+      font-size: 0.85rem;
+    }
+  </style>
 </head>
 <body>
 
-    <header>
-        <div class="brand"><iconify-icon icon="grommet-icons:gamepad"></iconify-icon> NOVA//GAMING PS2</div>
-    </header>
+<div class="chat-app">
+  <div class="chat-header">
+    <div class="brand">
+      <iconify-icon icon="solar:chat-round-line-bold-duotone" style="font-size: 1.6rem; color: var(--accent);"></iconify-icon>
+      <div>
+        <h3 style="font-size: 0.95rem; font-weight: 700;">CHAT GLOBAL</h3>
+      </div>
+      <div class="live-indicator">
+        <div class="live-dot"></div> LIVE
+      </div>
+    </div>
+    <div class="header-right-actions">
+      <div class="user-badge" id="userBadge">
+        <iconify-icon icon="solar:user-circle-bold"></iconify-icon>
+        <span id="badgeName">Anónimo</span>
+      </div>
+      <!-- Botón Ajustes Superior Derecho -->
+      <button class="icon-btn-settings" id="settingsToggleBtn" title="Ajustes de usuario">
+        <iconify-icon icon="solar:settings-bold-duotone" style="font-size: 1.25rem;"></iconify-icon>
+      </button>
+    </div>
+  </div>
 
-    <section id="view-home" class="view-section active">
-        <div class="category-slider">
-            <div class="chip active" onclick="filterCategory('all', this)">Todos</div>
-            <div class="chip" onclick="filterCategory('Acción', this)">Acción</div>            
-        </div>
-        <div class="game-grid" id="home-grid"></div>
-    </section>
+  <!-- Panel Ajustes Flotante Derecho -->
+  <div class="settings-panel" id="settingsPanel">
+    <div class="settings-title">Personalización del Chat</div>
+    <div class="field-group">
+      <label>Tu Nombre de Usuario:</label>
+      <input type="text" id="usernameInput" placeholder="Escribe tu nombre..." maxlength="20">
+    </div>
+    <div class="field-group">
+      <label>Color de Acento:</label>
+      <select id="colorSelect">
+        <option value="#3b82f6">Azul Eléctrico</option>
+        <option value="#8b5cf6">Morado Neón</option>
+        <option value="#10b981">Verde Esmeralda</option>
+        <option value="#f43f5e">Rosa Carmesí</option>
+        <option value="#f59e0b">Ámbar Fuego</option>
+      </select>
+    </div>
+    <button class="action-btn send-btn" id="saveSettingsBtn" style="width: 100%; border-radius: 10px; height: 36px; font-size: 0.8rem; font-weight: 600;">Guardar Cambios</button>
+  </div>
 
-    <section id="view-search" class="view-section">
-        <div class="search-wrapper">
-            <iconify-icon icon="lucide:search"></iconify-icon>
-            <input type="text" id="search-input" class="search-input" placeholder="Buscar título de PlayStation 2...">
-        </div>
-        <div class="game-grid" id="search-grid"></div>
-    </section>
+  <!-- Viewport Mensajes -->
+  <div class="messages-viewport" id="viewport"></div>
 
-    <section id="view-emulador" class="view-section">
-        <h2 class="section-title"><iconify-icon icon="lucide:cpu" style="color:var(--accent-blue)"></iconify-icon> Núcleo de Emulación</h2>
-        
-        <div class="glass-block">
-            <div class="specs-table">
-                <div class="specs-row">
-                    <span class="spec-label">Nombre del Emulador</span>
-                    <span class="spec-value">AetherSX2 Engine</span>
-                </div>
-                <div class="specs-row">
-                    <span class="spec-label">Calificación del Emulador</span>
-                    <span class="spec-value" style="color:#ffcc00">
-                        <iconify-icon icon="solar:star-bold"></iconify-icon>
-                        <iconify-icon icon="solar:star-bold"></iconify-icon>
-                        <iconify-icon icon="solar:star-bold"></iconify-icon>
-                        <iconify-icon icon="solar:star-bold"></iconify-icon>
-                        <iconify-icon icon="solar:star-bold"></iconify-icon> 
-                        <span style="color:#fff; margin-left:2px;">(5.0)</span>
-                    </span>
-                </div>
-                <div class="specs-row">
-                    <span class="spec-label">Versión del Emulador</span>
-                    <span class="spec-value">v1.5-3606 (Estable)</span>
-                </div>
-                <div class="specs-row">
-                    <span class="spec-label">Peso</span>
-                    <span class="spec-value" style="color:var(--accent-blue)">18.4 MB</span>
-                </div>
-                <div class="specs-row">
-                    <span class="spec-label">Lanzamiento global</span>
-                    <span class="spec-value">30 Dic 2021</span>
-                </div>
-            </div>
-        </div>
+  <!-- Banner Respuesta Activa -->
+  <div class="reply-preview-bar" id="replyBar">
+    <div class="reply-preview-info">
+      <div class="reply-preview-title" id="replyAuthor">Respondiendo a User</div>
+      <div class="reply-preview-text" id="replyText">Mensaje...</div>
+    </div>
+    <button class="icon-btn-settings" id="cancelReplyBtn" style="width:28px; height:28px; border:none;"><iconify-icon icon="solar:close-circle-bold"></iconify-icon></button>
+  </div>
 
-        <div class="glass-block" style="margin: 16px 0 20px 0;">
-            <h3 class="block-title">Acerca de</h3>
-            <p class="block-text">AetherSX2 es un emulador de alto rendimiento de la consola PlayStation 2 para dispositivos móviles. Permite la renderización directa a través de APIs de bajo nivel de hardware (Vulkan), logrando velocidades de fotogramas completas en procesadores de arquitectura ARM64.</p>
-        </div>
+  <!-- Emoji Selector Flotante -->
+  <div class="emoji-picker-panel" id="emojiPicker">
+    <div class="emoji-picker-header">EMOJIS RÁPIDOS</div>
+    <div class="emoji-grid" id="emojiGrid"></div>
+  </div>
 
-        <button class="btn-universal" onclick="openCustomTab('https://www.mediafire.com/file/df59kpd6x8afifl/AetherSX2-v1.5-4248-Aethersx2apk.com.apk/file', 'AetherSX2 APK Engine')">
-            <iconify-icon icon="lucide:download"></iconify-icon> Descargar
+  <div class="chat-footer">
+    <form class="input-wrapper" id="chatForm">
+      <input type="text" id="msgInput" placeholder="Escribe un mensaje..." maxlength="300" autocomplete="off" required>
+      <span class="char-counter" id="charCounter">300</span>
+      <div class="input-actions">
+        <button type="button" class="action-btn" id="emojiToggleBtn" title="Emojis">
+          <iconify-icon icon="solar:smile-circle-bold-duotone" style="font-size: 1.35rem;"></iconify-icon>
         </button>
-    </section>
+        <button type="submit" class="action-btn send-btn" title="Enviar">
+          <iconify-icon icon="solar:plain-3-bold-duotone" style="font-size: 1.25rem;"></iconify-icon>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 
-    <div class="details-panel" id="details-panel">
-        <div class="panel-header">
-            <button class="btn-back" id="panel-back-btn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                Atrás
-            </button>
-            <button class="btn-heart" id="panel-fav-btn"><iconify-icon icon="solar:heart-bold"></iconify-icon></button>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { 
+    getDatabase, 
+    ref, 
+    push, 
+    remove,
+    onChildAdded, 
+    onChildChanged, 
+    onChildRemoved,
+    runTransaction 
+  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDYDq_dAc2fJI8HYwe7qXFM7BueiC3yDPQ",
+    authDomain: "nova-api-3a052.firebaseapp.com",
+    databaseURL: "https://nova-api-3a052-default-rtdb.firebaseio.com",
+    projectId: "nova-api-3a052",
+    storageBucket: "nova-api-3a052.firebasestorage.app",
+    messagingSenderId: "300651642455",
+    appId: "1:300651642455:web:533eeb0e6dac60f825ed12"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const EXPIRATION_MS = 72 * 60 * 60 * 1000;
+
+  // Estado del Usuario y Configuración
+  let activeReply = null;
+  function setupIdentity() {
+    let saved = localStorage.getItem('nova_user');
+    if (!saved) {
+      const randomId = Math.floor(1000 + Math.random() * 9000);
+      saved = JSON.stringify({ uid: `usr_${Date.now()}_${randomId}`, name: `User #${randomId}`, color: '#3b82f6' });
+      localStorage.setItem('nova_user', saved);
+    }
+    return JSON.parse(saved);
+  }
+
+  let user = setupIdentity();
+  const messagesRef = ref(db, 'global_chat');
+  const viewport = document.getElementById('viewport');
+
+  function applyUserConfig() {
+    document.getElementById('badgeName').textContent = user.name;
+    document.getElementById('usernameInput').value = user.name;
+    document.getElementById('colorSelect').value = user.color || '#3b82f6';
+    document.documentElement.style.setProperty('--accent', user.color || '#3b82f6');
+  }
+  applyUserConfig();
+
+  // Sonido de envío sin librerías usando Web Audio API
+  function playPopSound() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(600, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.08);
+    } catch (e) {}
+  }
+
+  // Panel Ajustes
+  const settingsPanel = document.getElementById('settingsPanel');
+  document.getElementById('settingsToggleBtn').onclick = (e) => {
+    e.stopPropagation();
+    settingsPanel.classList.toggle('active');
+    emojiPicker.classList.remove('active');
+  };
+
+  document.getElementById('saveSettingsBtn').onclick = () => {
+    const nameVal = document.getElementById('usernameInput').value.trim();
+    if (nameVal) user.name = nameVal;
+    user.color = document.getElementById('colorSelect').value;
+    localStorage.setItem('nova_user', JSON.stringify(user));
+    applyUserConfig();
+    settingsPanel.classList.remove('active');
+  };
+
+  // Galería de Emojis
+  const emojiList = ['🔥','😂','❤️','🍿','👏','😎','🙌','🚀','💀','🎉','⚡','😍','🤔','💯','🥳','👍','👎','💩','👀','✨','💪','🎯','🤩','👑'];
+  const emojiGrid = document.getElementById('emojiGrid');
+  const emojiPicker = document.getElementById('emojiPicker');
+  const emojiToggleBtn = document.getElementById('emojiToggleBtn');
+  const msgInput = document.getElementById('msgInput');
+  const charCounter = document.getElementById('charCounter');
+
+  emojiList.forEach(emoji => {
+    const item = document.createElement('div');
+    item.className = 'emoji-grid-item';
+    item.textContent = emoji;
+    item.onclick = () => {
+      msgInput.value += emoji;
+      updateCounter();
+      msgInput.focus();
+    };
+    emojiGrid.appendChild(item);
+  });
+
+  function updateCounter() {
+    charCounter.textContent = 300 - msgInput.value.length;
+  }
+  msgInput.addEventListener('input', updateCounter);
+
+  emojiToggleBtn.onclick = (e) => {
+    e.stopPropagation();
+    emojiPicker.classList.toggle('active');
+    settingsPanel.classList.remove('active');
+  };
+
+  document.onclick = (e) => {
+    if (!emojiPicker.contains(e.target) && e.target !== emojiToggleBtn) emojiPicker.classList.remove('active');
+    if (!settingsPanel.contains(e.target) && e.target !== document.getElementById('settingsToggleBtn')) settingsPanel.classList.remove('active');
+  };
+
+  // Cancelar Respuesta
+  document.getElementById('cancelReplyBtn').onclick = () => {
+    activeReply = null;
+    document.getElementById('replyBar').classList.remove('active');
+  };
+
+  // Enviar mensaje
+  document.getElementById('chatForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const val = msgInput.value.trim();
+    if (!val) return;
+
+    const payload = {
+      uid: user.uid,
+      author: user.name,
+      text: val,
+      timestamp: Date.now(),
+      reactions: {}
+    };
+
+    if (activeReply) payload.replyTo = activeReply;
+
+    push(messagesRef, payload);
+    playPopSound();
+
+    msgInput.value = '';
+    updateCounter();
+    activeReply = null;
+    document.getElementById('replyBar').classList.remove('active');
+    emojiPicker.classList.remove('active');
+  });
+
+  // Calculador de Expiración
+  function getRemainingTimeString(timestamp) {
+    const remaining = EXPIRATION_MS - (Date.now() - timestamp);
+    if (remaining <= 0) return 'Expirado';
+
+    const hours = Math.floor(remaining / (1000 * 60 * 60));
+    const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+    return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+  }
+
+  function formatTime(timestamp) {
+    return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function setReplyTarget(data) {
+    activeReply = { author: data.author, text: data.text };
+    document.getElementById('replyAuthor').textContent = `Respondiendo a ${data.author}`;
+    document.getElementById('replyText').textContent = data.text;
+    document.getElementById('replyBar').classList.add('active');
+    msgInput.focus();
+  }
+
+  // Renderizar Mensaje
+  function createOrUpdateMessage(data, key) {
+    if (Date.now() - data.timestamp >= EXPIRATION_MS) return;
+
+    let el = document.getElementById(`m-${key}`);
+    const isOwn = data.uid === user.uid;
+
+    if (!el) {
+      el = document.createElement('div');
+      el.id = `m-${key}`;
+      el.className = `message-group ${isOwn ? 'own' : 'other'}`;
+      viewport.appendChild(el);
+
+      // Deslizar para responder (Swipe derecha)
+      let touchStartX = 0;
+      el.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, {passive: true});
+      el.addEventListener('touchmove', e => {
+        let diff = e.touches[0].clientX - touchStartX;
+        if (diff > 0 && diff < 70) el.style.transform = `translateX(${diff}px)`;
+      }, {passive: true});
+      el.addEventListener('touchend', e => {
+        if (parseInt(el.style.transform.replace('translateX(', '') || 0) > 35) setReplyTarget(data);
+        el.style.transform = 'translateX(0px)';
+      });
+    }
+
+    let reactionsHTML = '';
+    if (data.reactions) {
+      const counts = {};
+      Object.values(data.reactions).forEach(emoji => { if (emoji) counts[emoji] = (counts[emoji] || 0) + 1; });
+      for (const [emoji, count] of Object.entries(counts)) {
+        reactionsHTML += `<div class="reaction-pill" onclick="window.sendReaction('${key}', '${emoji}')">${emoji} ${count}</div>`;
+      }
+    }
+
+    let replyHTML = '';
+    if (data.replyTo) {
+      replyHTML = `
+        <div class="reply-quote">
+          <div class="reply-quote-author">${sanitize(data.replyTo.author)}</div>
+          <div class="reply-quote-text">${sanitize(data.replyTo.text)}</div>
         </div>
-        <div class="panel-scroll">
-            <div class="hero-banner">
-                <img src="" alt="" class="big-cover" id="panel-img">
-                <div class="hero-info-text">
-                    <h2 class="detail-title" id="panel-title"></h2>
-                    <div style="display:flex; gap:6px;">
-                        <span class="tag region" id="panel-region"></span>
-                        <span class="tag" id="panel-size" style="color:var(--accent-blue)"></span>
-                    </div>
-                </div>
-            </div>
-            <div class="glass-block">
-                <h3 class="block-title"><iconify-icon icon="lucide:info"></iconify-icon> Análisis de Imagen</h3>
-                <p class="block-text" id="panel-desc"></p>
-            </div>
-            <button class="btn-universal" id="panel-download-btn">
-                <iconify-icon icon="lucide:download"></iconify-icon> Descargar
-            </button>
+      `;
+    }
+
+    const deleteHTML = isOwn ? `
+      <button class="delete-btn" onclick="window.deleteMsg('${key}')" title="Eliminar mensaje">
+        <iconify-icon icon="solar:trash-bin-trash-bold" style="font-size: 0.75rem;"></iconify-icon>
+      </button>
+    ` : '';
+
+    const timeStr = formatTime(data.timestamp);
+    const expireStr = getRemainingTimeString(data.timestamp);
+
+    el.innerHTML = `
+      <span class="msg-author">${sanitize(data.author)}</span>
+      <div class="msg-bubble-wrapper" onclick="window.triggerReply('${key}')">
+        <div class="reaction-trigger-zone">
+          <span class="react-opt" onclick="window.sendReaction('${key}', '👍')">👍</span>
+          <span class="react-opt" onclick="window.sendReaction('${key}', '❤️')">❤️</span>
+          <span class="react-opt" onclick="window.sendReaction('${key}', '😂')">😂</span>
+          <span class="react-opt" onclick="window.sendReaction('${key}', '🔥')">🔥</span>
+          <span class="react-opt" onclick="window.sendReaction('${key}', '💩')">💩</span>
         </div>
-    </div>
-
-    <div class="bottom-nav-container">
-        <div class="nav-items-wrapper">
-            <div class="nav-indicator" id="nav-indicator"></div>
-            <button class="nav-item active" onclick="switchView('home', 0)">
-                <iconify-icon icon="fluent:home-24-filled"></iconify-icon>
-                <span>Home</span>
-            </button>
-            <button class="nav-item" onclick="switchView('search', 1)">
-                <iconify-icon icon="solar:magnifer-linear"></iconify-icon>
-                <span>Search</span>
-            </button>
-            <button class="nav-item" onclick="switchView('emulador', 2)">
-                <iconify-icon icon="solar:cpu-bolt-line-duotone"></iconify-icon>
-                <span>Emulador</span>
-            </button>
+        <div class="msg-bubble">
+          ${replyHTML}
+          ${sanitize(data.text)}
         </div>
-    </div>
+      </div>
+      <div class="active-reactions">${reactionsHTML}</div>
+      <div class="msg-meta">
+        <span>${timeStr}</span>
+        <span>•</span>
+        <span class="expiry-tag">
+          <iconify-icon icon="solar:clock-circle-bold" style="font-size: 0.75rem;"></iconify-icon>
+          ${expireStr}
+        </span>
+        ${deleteHTML}
+      </div>
+    `;
 
-    <div class="custom-tab-overlay" id="custom-tab-overlay">
-        <div class="custom-tab-window">
-            <div class="custom-tab-navbar">
-                <div class="tab-browser-info">
-                    <div class="tab-title" id="custom-tab-title">Cargando servidor...</div>
-                    <div class="tab-url"><iconify-icon icon="solar:lock-password-bold" style="color:var(--success-green)"></iconify-icon> mediafire.com/secure_gateway</div>
-                </div>
-                <button class="btn-tab-close" onclick="closeCustomTab()">Cerrar</button>
-            </div>
-            
-            <div class="tab-handover-body">
-                <div class="handover-icon-box">
-                    <div class="handover-pulse"></div>
-                    <iconify-icon icon="solar:shield-check-bold-duotone" style="font-size: 5rem; color: var(--accent-blue); filter: drop-shadow(0 0 20px var(--accent-glow));"></iconify-icon>
-                </div>
-                <div>
-                    <h3>Enlace de Descarga Verificado</h3>
-                    <p id="custom-tab-msg">El servidor seguro requiere que la descarga se ejecute mediante una firma criptográfica directa del navegador nativo.</p>
-                </div>
-                <button class="btn-universal" id="custom-tab-action-btn" style="max-width: 290px; margin-top: 8px;">
-                    <iconify-icon icon="solar:double-alt-arrow-right-bold-duotone" style="font-size: 1.2rem;"></iconify-icon> Iniciar Descarga
-                </button>
-            </div>
-        </div>
-    </div>
+    el.dataset.payload = JSON.stringify(data);
+    viewport.scrollTop = viewport.scrollHeight;
+  }
 
-    <script>
-        // BASE DE DATOS CO-DESARROLLADA CON ENLACES ORIGINALES
-        const gamesData = [
-            { id: "nfs", title: "Need for Speed Most Wanted", size: "3.81 GB", region: "RAM : 6 GB", category: "Acción", cover: "https://m.media-amazon.com/images/M/MV5BYzZlMjBjYjItMzUzOC00YTJlLThiNWQtNjViZjc1MTA2ZGE1XkEyXkFqcGc@._V1_QL75_UX190_CR0,2,190,281_.jpg", desc: "Need for Speed: Most Wanted es un videojuego de carreras de la saga Need for Speed desarrollado por Electronic Arts y Criterion Games para Xbox 360, PlayStation 3, Wii U, PlayStation Vita y PC.", url: "https://www.mediafire.com/file/5lax6154apnxf1y" },
-            
-            { id: "hitman", title: "Grand Theft Auto San Andreas", size: "4.19 GB", region: "RAM : 6 GB", category: "Acción", cover: "https://m.media-amazon.com/images/I/616z3iyu9-L._AC_UF1000,1000_QL80_.jpg", desc: "Grand Theft Auto: San Andreas es uno de los videojuegos de acción-aventura de mundo abierto más emblemáticos e influyentes de la historia, desarrollado por Rockstar North y lanzado originalmente en 2004.", url: "https://www.mediafire.com/file/qc6x7nvnr3pdole/Grand_Theft_Auto_San_Andreas-Dark-Emulador.iso/file" },
-            
-            { id: "godofwar2", title: "God of War", size: "6.11 GB", region: "RAM : 6 GB", category: "Acción", cover: "https://m.media-amazon.com/images/M/MV5BMDkxMzExYjAtZmQwMC00MmQzLWE1M2QtMGEwY2M1N2I0NDIwXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg", desc: "God of War es una de las franquicias más exitosas y aclamadas de la historia de los videojuegos. Desarrollada principalmente por Sony Santa Monica Studio, la saga narra el viaje de redención y venganza de Kratos, un guerrero espartano que se convierte en el Dios de la Guerra tras enfrentarse a los panteones mitológicos más poderosos del planeta. ", url: "https://www.mediafire.com" },
-            
-            { id: "dbzbudokai", title: "God of War II", size: " 6 GB", region: "RAM : 6 GB", category: "Acción", cover: "https://m.media-amazon.com/images/M/MV5BNDMyNGJiMzgtMzY0Ny00MDc1LWEzMDYtNzM4ZTIxZWNkNTgwXkEyXkFqcGc@._V1_.jpg", desc: "God of War II es un aclamado videojuego de acción y aventura desarrollado por Santa Monica Studio y lanzado originalmente para la PlayStation 2 en 2007. Es la secuela directa del juego de 2005 y es considerado uno de los mejores títulos de la historia de la consola. ", url: "https://www.mediafire.com" }
-        ];
+  // Listeners Firebase
+  onChildAdded(messagesRef, snap => createOrUpdateMessage(snap.val(), snap.key));
+  onChildChanged(messagesRef, snap => createOrUpdateMessage(snap.val(), snap.key));
+  onChildRemoved(messagesRef, snap => {
+    const el = document.getElementById(`m-${snap.key}`);
+    if (el) el.remove();
+  });
 
-        let favorites = JSON.parse(localStorage.getItem('nexus_ultra_favs')) || [];
-        let activeContext = null;
+  window.sendReaction = (key, emoji) => {
+    const reactRef = ref(db, `global_chat/${key}/reactions/${user.uid}`);
+    runTransaction(reactRef, curr => (curr === emoji ? null : emoji));
+  };
 
-        // Renderizador de Tarjetas
-        function buildGrid(data, containerId) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
-            if(data.length === 0) {
-                container.innerHTML = `<div style="grid-column:1/-1; color:var(--text-grey); text-align:center; padding:40px; font-size:0.9rem;">No se encontraron títulos.</div>`;
-                return;
-            }
-            data.forEach(game => {
-                const isFav = favorites.includes(game.id);
-                const card = document.createElement('div');
-                card.className = 'game-card';
-                card.innerHTML = `
-                    <div class="image-container">
-                        <div class="tag-system">
-                            <span class="tag region">${game.region}</span>
-                            <span class="tag fav" id="badge-${containerId}-${game.id}" style="display:${isFav?'block':'none'}">♥</span>
-                        </div>
-                        <img src="${game.cover}" class="game-cover" loading="lazy">
-                        <div class="card-overlay"></div>
-                    </div>
-                    <div class="card-details">
-                        <div class="game-title">${game.title}</div>
-                        <div class="game-meta"><span>${game.category}</span><span class="game-size">${game.size}</span></div>
-                    </div>
-                `;
-                card.addEventListener('click', () => openDetails(game));
-                container.appendChild(card);
-            });
-        }
+  window.deleteMsg = (key) => {
+    const msgRef = ref(db, `global_chat/${key}`);
+    remove(msgRef);
+  };
 
-        // Cambio de Vistas e Indicador Animado
-        function switchView(view, index) {
-            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
-            document.getElementById(`view-${view}`).classList.add('active');
-            
-            const navButtons = document.querySelectorAll('.nav-item');
-            navButtons[index].classList.add('active');
+  window.triggerReply = (key) => {
+    const el = document.getElementById(`m-${key}`);
+    if (el && el.dataset.payload) setReplyTarget(JSON.parse(el.dataset.payload));
+  };
 
-            // Mover la píldora indicadora con cálculos exactos por JS
-            const indicator = document.getElementById('nav-indicator');
-            indicator.style.transform = `translateX(${index * 100}%)`;
-
-            if(view === 'search') {
-                document.getElementById('search-input').value = '';
-                buildGrid(gamesData, 'search-grid');
-            }
-        }
-
-        // Filtro rápido de categorías
-        function filterCategory(category, element) {
-            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-            element.classList.add('active');
-            if(category === 'all') {
-                buildGrid(gamesData, 'home-grid');
-            } else {
-                const filtered = gamesData.filter(g => g.category === category);
-                buildGrid(filtered, 'home-grid');
-            }
-        }
-
-        // Panel de Detalles
-        function openDetails(game) {
-            activeContext = game;
-            document.getElementById('panel-img').src = game.cover;
-            document.getElementById('panel-title').textContent = game.title;
-            document.getElementById('panel-region').textContent = game.region;
-            document.getElementById('panel-size').textContent = game.size;
-            document.getElementById('panel-desc').textContent = game.desc;
-
-            const favBtn = document.getElementById('panel-fav-btn');
-            favBtn.className = 'btn-heart' + (favorites.includes(game.id) ? ' liked' : '');
-
-            // Configurar acción del botón Descargar
-            const dlBtn = document.getElementById('panel-download-btn');
-            dlBtn.onclick = () => openCustomTab(game.url, game.title);
-
-            document.getElementById('details-panel').classList.add('active');
-            history.pushState({view: 'details'}, '');
-        }
-
-        function closeDetails() {
-            document.getElementById('details-panel').classList.remove('active');
-            buildGrid(gamesData, 'home-grid');
-        }
-
-        // 👑 CONTROL INTEGRAL LOGICO DE LA INTERFAZ PRO CUSTOM TAB
-        function openCustomTab(url, title) {
-            document.getElementById('custom-tab-title').textContent = title;
-            document.getElementById('custom-tab-msg').innerHTML = `El canal de descarga para <strong>${title}</strong> ha sido securizado. MediaFire requiere la asignación de cabeceras de sistema nativas para saltar las restricciones estructurales e iniciar tu archivo sin problemas.`;
-            
-            // Asignar el enlace dinámicamente al botón Pro Handover
-            const actionBtn = document.getElementById('custom-tab-action-btn');
-            actionBtn.onclick = () => {
-                window.open(url, '_blank');
-                closeCustomTab();
-            };
-            
-            document.getElementById('custom-tab-overlay').classList.add('open');
-            // Insertamos otro estado en el historial para control físico
-            history.pushState({view: 'customtab'}, '');
-        }
-
-        function closeCustomTab() {
-            document.getElementById('custom-tab-overlay').classList.remove('open');
-        }
-
-        // Intercepción Global Inteligente de Gestos Físicos (Atrás de Android)
-        window.addEventListener('popstate', (event) => {
-            const customTab = document.getElementById('custom-tab-overlay');
-            const detailsPanel = document.getElementById('details-panel');
-
-            // Si el custom tab está abierto, el botón atrás lo cierra a él primero
-            if (customTab.classList.contains('open')) {
-                closeCustomTab();
-            } else if (detailsPanel.classList.contains('active')) {
-                closeDetails();
-            }
-        });
-
-        document.getElementById('panel-back-btn').addEventListener('click', () => {
-            if(window.history.state && window.history.state.view === 'details') window.history.back();
-        });
-
-        // Toggle de favoritos
-        document.getElementById('panel-fav-btn').addEventListener('click', function() {
-            if(!activeContext) return;
-            const id = activeContext.id;
-            const idx = favorites.indexOf(id);
-            if(idx > -1) {
-                favorites.splice(idx, 1);
-                this.classList.remove('liked');
-            } else {
-                favorites.push(id);
-                this.classList.add('liked');
-            }
-            localStorage.setItem('nexus_ultra_favs', JSON.stringify(favorites));
-        });
-
-        // Buscador reactivo
-        document.getElementById('search-input').addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            const filtered = gamesData.filter(g => g.title.toLowerCase().includes(query));
-            buildGrid(filtered, 'search-grid');
-        });
-
-        // Carga inicial
-        buildGrid(gamesData, 'home-grid');
-    </script>
+  function sanitize(str) {
+    return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+  }
+</script>
 </body>
 </html>
-
